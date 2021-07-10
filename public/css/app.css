@@ -1,0 +1,7 @@
+body > .ui.container {
+    margin-top: 3em;
+}
+
+.bordered-column{
+    border: 1px solid #C0C1C2;
+}

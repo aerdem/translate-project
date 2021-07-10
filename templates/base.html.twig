@@ -5,11 +5,13 @@
     <title>{% block title %}Welcome!{% endblock %}</title>
     {% block stylesheets %}
         <link rel="stylesheet" type="text/css" href="{{ asset('css/semantic.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
     {% endblock %}
 
     {% block javascripts %}
         <script src="{{ asset('js/jquery-3.1.1.min.js') }}"></script>
         <script src="{{ asset('js/semantic.js') }}"></script>
+        <script src="{{ asset('js/app.js') }}"></script>
     {% endblock %}
 
 </head>

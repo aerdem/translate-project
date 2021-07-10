@@ -3,18 +3,73 @@
 {% block title %}Translate Page{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <div class="ui container">
+        <h1 class="ui center aligned header">Translator</h1>
+        <div class="ui grid">
+            <div class="two column row">
+                <div class="column bordered-column">
+                    <div class="field">
+                        <div class="ui fluid search selection dropdown">
+                            <input type="hidden" name="country" value="ax">
+                            <i class="dropdown icon"></i>
+                            <input class="search" autocomplete="off" tabindex="0"
+                                   data-com.bitwarden.browser.user-edited="yes">
+                            <div class="text">Dili Algıla</div>
+                            <div class="menu transition hidden" tabindex="-1">
+                                <div class="item active selected" data-value="" dir="">Dili Algıla</div>
+                                {% block source_languages %}
+                                    {%  for key, language in languages%}
+                                        <div class="item" data-value="{{ key }}" dir="{{ language.dir }}">{{ language.name }}</div>
+                                    {%  endfor %}
+                                {%  endblock %}
+                            </div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="column bordered-column">
+                    <div class="field">
+                        <div class="ui fluid search selection dropdown">
+                            <input type="hidden" name="country" value="ax">
+                            <i class="dropdown icon"></i>
+                            <input class="search" autocomplete="off" tabindex="0"
+                                   data-com.bitwarden.browser.user-edited="yes">
+                            <div class="text">Seçiniz</div>
+                            <div class="menu transition hidden" tabindex="-1">
+                                {% block target_languages %}
+                                    {%  for key, language in languages%}
+                                        <div class="item" data-value="{{ key }}" dir="{{ language.dir }}">{{ language.name }}</div>
+                                    {%  endfor %}
+                                {%  endblock %}
+                            </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ '/media/erdem/SecondDisk/translate-project/src/Controller/TranslateController.php'|file_link(0) }}">src/Controller/TranslateController.php</a></code></li>
-        <li>Your template at <code><a href="{{ '/media/erdem/SecondDisk/translate-project/templates/translate/index.html.twig'|file_link(0) }}">templates/translate/index.html.twig</a></code></li>
-    </ul>
-</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column bordered-column">
+                    <div class="ui form">
+                        <div class="field">
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="column bordered-column">
+                    <div class="ui form">
+                        <div class="field">
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <button class="ui basic button">
+            <i class="icon history"></i>
+            Geçmiş
+        </button>
+        <button class="ui basic button">
+            <i class="icon bookmark outline"></i>
+            Kaydedilenler
+        </button>
+    </div>
 {% endblock %}
