@@ -9,13 +9,13 @@
             <div class="two column row">
                 <div class="column bordered-column">
                     <div class="field">
-                        <div class="ui fluid search selection dropdown">
-                            <input type="hidden" name="country" value="ax">
+                        <div class="ui fluid search selection dropdown" id="sourceLanguage">
+                            <input type="hidden" name="source_language">
                             <i class="dropdown icon"></i>
                             <input class="search" autocomplete="off" tabindex="0"
-                                   data-com.bitwarden.browser.user-edited="yes">
-                            <div class="text">Dili Algıla</div>
-                            <div class="menu transition hidden" tabindex="-1">
+                                   data-com.bitwarden.browser.user-edited="yes" >
+                            <div class="text sourceActiveText">Dili Algıla</div>
+                            <div class="menu transition hidden sourceLanguageItems" tabindex="-1">
                                 <div class="item active selected" data-value="" dir="">Dili Algıla</div>
                                 {% block source_languages %}
                                     {%  for key, language in languages%}
@@ -29,13 +29,14 @@
                 </div>
                 <div class="column bordered-column">
                     <div class="field">
-                        <div class="ui fluid search selection dropdown">
-                            <input type="hidden" name="country" value="ax">
+                        <div class="ui fluid search selection dropdown" id="targetLanguage">
+                            <input type="hidden" name="target_language">
                             <i class="dropdown icon"></i>
                             <input class="search" autocomplete="off" tabindex="0"
                                    data-com.bitwarden.browser.user-edited="yes">
-                            <div class="text">Seçiniz</div>
-                            <div class="menu transition hidden" tabindex="-1">
+                            <div class="text targetActiveText">Seçiniz</div>
+                            <div class="menu transition hidden targetLanguageItems" tabindex="-1">
+                                <div class="item active selected" data-value="" dir="">Seçiniz</div>
                                 {% block target_languages %}
                                     {%  for key, language in languages%}
                                         <div class="item" data-value="{{ key }}" dir="{{ language.dir }}">{{ language.name }}</div>
@@ -49,20 +50,24 @@
                 <div class="column bordered-column">
                     <div class="ui form">
                         <div class="field">
-                            <textarea></textarea>
+                            <textarea id="sourceText"></textarea>
                         </div>
                     </div>
                 </div>
                 <div class="column bordered-column">
                     <div class="ui form">
                         <div class="field">
-                            <textarea></textarea>
+                            <textarea id="targetText"></textarea>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <br>
+        <button class="ui basic button" id="translateButton">
+            <i class="icon question circle outline"></i>
+            Çevir
+        </button>
         <button class="ui basic button">
             <i class="icon history"></i>
             Geçmiş

@@ -10,7 +10,7 @@ class Translator
 
     public function getLanguages()
     {
-        $params= array(
+        $params = array(
             "method" => "GET",
             "endpoint" => '/languages?api-version=3.0&scope=translation',
             "data" => []
@@ -21,13 +21,15 @@ class Translator
     /**
      * @return mixed
      */
-    public function translate()
+    public function translate($translateParams)
     {
-        $params= array(
+        $from = ($translateParams['sourceLanguage']) ? "&from=" . $translateParams['sourceLanguage'] : '';
+        $to = $translateParams['targetLanguage'];
+        $params = array(
             "method" => "POST",
-            "endpoint" => '/translate?api-version=3.0&to=tr',
+            "endpoint" => '/translate?api-version=3.0&to=' . $to . $from,
             "data" => array(
-                ["Text" => "Hello"]
+                ["Text" => $translateParams['sourceText']]
             )
         );
 

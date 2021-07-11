@@ -6,6 +6,8 @@ use App\Service\Translator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class TranslateController extends AbstractController
 {
@@ -31,12 +33,14 @@ class TranslateController extends AbstractController
      * @param Translator $translator
      * @return Response
      */
-    public function getTranslate(translator $translator): Response
+    public function getTranslate(translator $translator, requestStack $requestStack): Response
     {
-        $translated = $translator->translate();
-        print_r($translated);
-        exit;
+        $request = $requestStack->getCurrentRequest();
+        $params = $request->request->all();
+        $translated = $translator->translate($params);
 
-        return json_encode($translated);
+        $response = new JsonResponse($translated, 200, array());
+        $response->setCallback('callback');
+        return $response;
     }
 }
