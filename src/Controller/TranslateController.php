@@ -9,21 +9,23 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Predis;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\HttpFoundation\Session\Session;
+
 
 class TranslateController extends AbstractController
 {
+    private $session;
+    public function __construct(){
+        $this->session = new Session();
+    }
     /**
      * @Route("/translate", name="translate")
      */
     public function index(translator $translator): Response
     {
-
         $languages = $translator->getLanguages();
-//        echo "<pre>";
-//        print_r($languages->translation);
-//        exit;
+        $this->languageCache($languages);
 
         return $this->render('translate/index.html.twig', [
             'controller_name' => 'TranslateController',
@@ -34,6 +36,7 @@ class TranslateController extends AbstractController
     /**
      * @Route ("getTranslate", name="getTranslate")
      * @param Translator $translator
+     * @param RequestStack $requestStack
      * @return Response
      */
     public function getTranslate(translator $translator, requestStack $requestStack): Response
@@ -62,19 +65,16 @@ class TranslateController extends AbstractController
         return $response;
     }
 
-    private function setHistory($parameters)
-    {
-        $redisClient = new Predis\Client();
+    private function setHistory($parameters){
         $serializer = new JsonEncoder();
         $key = $serializer->encode($parameters['requestParams'], 'json');
         $value = $serializer->encode($parameters['responseParams'], 'json');
-        $redisClient->set($key, $value);
+        $this->session->set($key,$value);
 
-
-        $languageCache = $serializer->decode($redisClient->get('languages'), 'array');
+        $languageCache = $serializer->decode($this->session->get('languages'), 'array');
         $key = "allCache";
-        if ($redisClient->get($key)) {
-            $cacheArray = $serializer->decode($redisClient->get($key), 'array');
+        if ($this->session->get($key)) {
+            $cacheArray = $serializer->decode($this->session->get($key), 'array');
         } else {
             $cacheArray = array();
         }
@@ -85,17 +85,15 @@ class TranslateController extends AbstractController
         );
 
         array_push($cacheArray, $parameters);
-        $redisClient->set($key, $serializer->encode($cacheArray, 'json'));
-
+        $this->session->set($key, $serializer->encode($cacheArray, 'json'));
     }
 
     private function controlFromHistory($parameters)
     {
-        $redisClient = new Predis\Client();
         $serializer = new JsonEncoder();
         $key = $serializer->encode($parameters, 'json');
-        if ($redisClient->get($key)) {
-            return $serializer->decode($redisClient->get($key), 'object');
+        if ($this->session->get($key)) {
+            return $serializer->decode($this->session->get($key), 'object');
         } else {
             return null;
         }
@@ -105,12 +103,11 @@ class TranslateController extends AbstractController
      * @Route ("getHistory", name="getHistory")
      * @return JsonResponse
      */
-    public function getHistory()
+    public function getHistory(): JsonResponse
     {
-        $redisClient = new Predis\Client();
         $serializer = new JsonEncoder();
 
-        $allCache = $redisClient->get("allCache");
+        $allCache = $this->session->get("allCache");
         if ($allCache) {
             $history = $serializer->decode($allCache, 'array');
         } else {
@@ -125,7 +122,7 @@ class TranslateController extends AbstractController
      * @Route ("setSaved", name="setSaved")
      * @return Response
      */
-    public function setSaved()
+    public function setSaved(): Response
     {
 
         $entityManager = $this->getDoctrine()->getManager();
@@ -148,7 +145,7 @@ class TranslateController extends AbstractController
      * @Route ("getSaved", name="getSaved")
      * @return Response
      */
-    public function getSaved()
+    public function getSaved(): Response
     {
 
         $translateRepository = $this->getDoctrine()->getRepository(Translate::class);
@@ -168,5 +165,16 @@ class TranslateController extends AbstractController
             );
         }
         */
+    }
+
+    private function languageCache($languages){
+        $languageCacheArray = array();
+        foreach ($languages->translation as $key => $language){
+            $languageCacheArray[$key] = $language->name;
+        }
+        $serializer = new JsonEncoder();
+        $value = $serializer->encode($languageCacheArray,'json');
+
+        $this->session->set("languages", $value);
     }
 }

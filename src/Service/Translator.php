@@ -2,13 +2,19 @@
 
 namespace App\Service;
 
-
 use GuzzleHttp\Client;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
 
 class Translator
 {
 
+    public function __construct(){
+
+    }
+
+    /**
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function getLanguages()
     {
         $params = array(
@@ -16,13 +22,12 @@ class Translator
             "endpoint" => '/languages?api-version=3.0&scope=translation',
             "data" => []
         );
-        $languages = $this->query($params);
-        $this->languageCache($languages);
-        return $languages;
+        return $this->query($params);
     }
 
     /**
      * @return mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function translate($translateParams)
     {
@@ -39,6 +44,9 @@ class Translator
         return $this->query($params);
     }
 
+    /**
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     private function query($params)
     {
         $key = '7c586f2d663f4b99beca2652a2217fc9';
@@ -55,19 +63,8 @@ class Translator
             'json' => $params['data']
         ];
         $res = $client->request($params['method'], $params['endpoint'], $requestParameters);
-        $ret = json_decode($res->getBody()->getContents());
-        return $ret;
-    }
-
-    private function languageCache($languages){
-        $languageCacheArray = array();
-        foreach ($languages->translation as $key => $language){
-            $languageCacheArray[$key] = $language->name;
-        }
-        $redisClient = new \Predis\Client();
-        $serializer = new JsonEncoder();
-        $value = $serializer->encode($languageCacheArray,'json');
-        $redisClient->set("languages", $value);
+        $serializer = new JsonDecode();
+        return $serializer->decode($res->getBody()->getContents(),"object");
     }
 }
 

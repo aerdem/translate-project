@@ -5,3 +5,15 @@ snc_redis:
       alias: default
       dsn: redis://127.0.0.1 # (*)
       logging: '%kernel.debug%'
+    cache:
+      type: predis
+      alias: cache
+      dsn: redis://secret@localhost/1
+      options:
+        profile: 2.2
+        connection_timeout: 10
+        read_write_timeout: 30
+      session:
+        type: predis
+        alias: session
+        dsn: redis://localhost/2
