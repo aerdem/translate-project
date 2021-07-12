@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Translate;
 use App\Service\Translator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -74,8 +75,7 @@ class TranslateController extends AbstractController
         $key = "allCache";
         if ($redisClient->get($key)) {
             $cacheArray = $serializer->decode($redisClient->get($key), 'array');
-        }
-        else {
+        } else {
             $cacheArray = array();
         }
 
@@ -85,7 +85,7 @@ class TranslateController extends AbstractController
         );
 
         array_push($cacheArray, $parameters);
-        $redisClient->set($key,$serializer->encode($cacheArray,'json'));
+        $redisClient->set($key, $serializer->encode($cacheArray, 'json'));
 
     }
 
@@ -105,12 +105,13 @@ class TranslateController extends AbstractController
      * @Route ("getHistory", name="getHistory")
      * @return JsonResponse
      */
-    public function getHistory(){
+    public function getHistory()
+    {
         $redisClient = new Predis\Client();
         $serializer = new JsonEncoder();
 
         $allCache = $redisClient->get("allCache");
-        if($allCache) {
+        if ($allCache) {
             $history = $serializer->decode($allCache, 'array');
         } else {
             $history = [];
@@ -118,5 +119,54 @@ class TranslateController extends AbstractController
         $response = new JsonResponse($history, 200, array());
         $response->setCallback('callback');
         return $response;
+    }
+
+    /**
+     * @Route ("setSaved", name="setSaved")
+     * @return Response
+     */
+    public function setSaved()
+    {
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $translate = new Translate();
+
+        $translate
+            ->setBrowserUniqueid("1")
+            ->setTranslate(array("test" => "test"))
+            ->setTest("Test");
+
+        $entityManager->persist($translate);
+        $entityManager->flush();
+
+
+        return new Response(sprintf("Başarılı %s", $translate->getId()));
+
+    }
+
+    /**
+     * @Route ("getSaved", name="getSaved")
+     * @return Response
+     */
+    public function getSaved()
+    {
+
+        $translateRepository = $this->getDoctrine()->getRepository(Translate::class);
+        $translate = ($translateRepository->findTranslate());
+        $serializer = new JsonEncoder();
+        $translateJson = $serializer->encode($translate, 'json');
+        return new Response($translateJson, Response::HTTP_OK, ['content-type' => 'application/json']);
+
+        /*
+        $translates = $translateRepository->findAll();
+        $translate = array();
+        foreach ($translates as $translate_key => $translate_value) {
+            $translate[$translate_key] = array(
+                "id" => $translate_value->getId(),
+                "browser_unqiue_id" => $translate_value->getBrowserUniqueid(),
+                "translate" => $translate_value->getTranslate()
+            );
+        }
+        */
     }
 }

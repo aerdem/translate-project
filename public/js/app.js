@@ -92,6 +92,7 @@ $(document).ready(function () {
 
         console.log(html);
         $('.sidebarContent').html(html);
+        $('.sidebarTitle').html("History");
         $('.ui.sidebar')
             .sidebar('toggle')
         ;
